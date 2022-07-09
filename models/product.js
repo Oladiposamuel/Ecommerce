@@ -5,7 +5,8 @@ const ObjectId = mongodb.ObjectId;
 
 class Product {
 
-    constructor(title, price, description, quantity, categoryId, _id, userId) {
+    constructor(image, title, price, description, quantity, categoryId, _id, userId) {
+        this.image = image;
         this.title = title;
         this.price = price;
         this.description = description;
@@ -29,7 +30,7 @@ class Product {
         }
         return dbOp
         .then(result => {
-            console.log(result);
+            //console.log(result);
         })
         .catch(error => {
             console.log(error);

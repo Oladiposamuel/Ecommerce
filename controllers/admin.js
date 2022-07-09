@@ -61,12 +61,17 @@ exports.login = async (req, res, next) => {
 }
 
 exports.createProduct = async (req, res, next) => {
+    const image = req.file;
     const title = req.body.title;
     const price = req.body.price;
     const description = req.body.description;
     const quantity = req.body.quantity;
     const bodyCategory = req.body.category;
     const userId = ObjectId(req.userId); 
+
+    console.log(image);
+
+    const imagePath = image.path;
 
     let savedCategoryId;
 
@@ -83,7 +88,7 @@ exports.createProduct = async (req, res, next) => {
     }
     
 
-    const product = new Product(title, price, description, quantity, savedCategoryId, null, userId);
+    const product = new Product(imagePath, title, price, description, quantity, savedCategoryId, null, userId);
     try {
         const savedProduct = await product.save();
         res.json({message: 'Product created', savedCategory: savedProduct, category: `Saved in ${bodyCategory} category`});
