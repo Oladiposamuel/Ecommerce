@@ -41,6 +41,39 @@ class Product {
             return error;
         })
     }
+
+    static findById(id) {
+        const db = getDb();
+        const prodId = ObjectId(id);
+
+        return db.collection('products').findOne({_id: prodId})
+        .then(result => {
+            //console.log(result);
+            return result;
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
+
+    edit(id) {
+        const db = getDb();
+        const prodId = ObjectId(id);
+
+        return db.collection('products').findOne({_id: prodId})
+        .then(result => {
+            delete this._id;
+            //console.log(this);
+            return db.collection('products').replaceOne({_id: prodId}, this)
+            .then(result => {
+                //console.log(result);
+                return result;
+            })
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
 }
 
 module.exports = Product;

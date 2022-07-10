@@ -10,6 +10,8 @@ router.put('/signup', adminController.signup);
 
 router.post('/login', adminController.login);
 
-router.post('/product', isAuthAdmin, adminController.createProduct);
+router.post('/create-product', isAuthAdmin, adminController.createProduct);
+
+router.post('/edit-product/:productId', isAuthAdmin, adminController.editProduct);
 
 module.exports = router;

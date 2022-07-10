@@ -96,3 +96,50 @@ exports.createProduct = async (req, res, next) => {
         next(error);
     }
 }
+
+exports.editProduct = async (req, res, net) => {
+    const prodId = req.params.productId;
+
+    const updatedImage = req.file;
+    const updatedTitle = req.body.title;
+    const updatedPrice = req.body.price;
+    const updatedDescription = req.body.description;
+    const updatedQuantity = req.body.quantity;
+    const updatedCategory = req.body.category;
+    const userId = ObjectId(req.userId);
+
+    let savedCategoryId;
+
+    try {
+        const category = new Category(null, bodyCategory);
+        const savedCategory = await category.save();
+        const getCategory = await Category.findCategoryId(bodyCategory);
+        //console.log(getCategory);
+        const categoryId = getCategory._id;
+        //console.log(categoryId);
+        savedCategoryId = categoryId;
+    } catch(error) {
+        console.log(error);
+    }
+
+    const updatedImagePath = updatedImage.path;
+
+    try {
+        const savedProduct = await Product.findById(prodId);
+        console.log(savedProduct);
+        savedProduct.image = updatedImagePath;
+        savedProduct.price = updatedPrice;
+        savedProduct.title = updatedTitle;
+        savedProduct.description = updatedDescription;
+        savedProduct.quantity = updatedQuantity;
+        savedProduct.category = updatedCategory;
+         
+        const product = new Product(updatedImagePath, updatedPrice, updatedTitle, updatedDescription, updatedQuantity, savedCategoryId, null, userId);
+        const editedSavedProduct = await product.edit(prodId);
+        console.log(editedSavedProduct);
+
+        res.send({message: 'Product edited!', product: editedSavedProduct});
+    } catch(error) {
+        console.log(error);
+    }
+}
