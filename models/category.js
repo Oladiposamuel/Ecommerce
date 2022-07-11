@@ -20,6 +20,7 @@ class Category {
         return dbOp
         .then(result => {
             //console.log(result);
+            return result;
         })
         .catch(error => {
             next(error);
@@ -30,20 +31,21 @@ class Category {
         const db = getDb();
         let getCategory;
 
-        return db.collection('category').findOne({name: name})
+        return db.collection('category').findOne({name: { "$regex" : name , "$options" : "i"}})
         .then(result => {
             if (result == null) {
                 return db.collection('category').insertOne({name: name})
                 .then(result => {
-                    return db.collection('category').findOne({name: name})
+                    return db.collection('category').findOne({name: { "$regex" : name , "$options" : "i"}})
                     .then(result => {
                         getCategory = result;
+                        return getCategory;
                     })
                 })
             } else {
                 getCategory = result;
+                return getCategory;
             }
-            return getCategory;
         })
         .catch(error => {
             next(error);

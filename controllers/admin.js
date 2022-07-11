@@ -76,13 +76,19 @@ exports.createProduct = async (req, res, next) => {
     let savedCategoryId;
 
     try {
-        const category = new Category(null, bodyCategory);
-        const savedCategory = await category.save();
-        const getCategory = await Category.findCategoryId(bodyCategory);
-        //console.log(getCategory);
-        const categoryId = getCategory._id;
-        //console.log(categoryId);
-        savedCategoryId = categoryId;
+        // const category = new Category(null, bodyCategory);
+        // const savedCategory = await category.save();
+        // //console.log(savedCategory);
+
+       // if (savedCategory) {
+            const getCategory = await Category.findCategoryId(bodyCategory);
+            console.log(getCategory);
+            const categoryId = getCategory._id;
+            //console.log(categoryId);
+            savedCategoryId = categoryId;
+        //}
+
+        
     } catch(error) {
         console.log(error);
     }
