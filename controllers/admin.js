@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const Product = require('../models/product');
@@ -75,25 +77,16 @@ exports.createProduct = async (req, res, next) => {
 
     let savedCategoryId;
 
-    try {
-        // const category = new Category(null, bodyCategory);
-        // const savedCategory = await category.save();
-        // //console.log(savedCategory);
-
-       // if (savedCategory) {
-            const getCategory = await Category.findCategoryId(bodyCategory);
-            console.log(getCategory);
-            const categoryId = getCategory._id;
-            //console.log(categoryId);
-            savedCategoryId = categoryId;
-        //}
-
-        
+    try {  
+        const getCategory = await Category.findCategoryId(bodyCategory);
+        console.log(getCategory);
+        const categoryId = getCategory._id;
+        //console.log(categoryId);
+        savedCategoryId = categoryId;   
     } catch(error) {
         console.log(error);
     }
     
-
     const product = new Product(imagePath, title, price, description, quantity, savedCategoryId, null, userId);
     try {
         const savedProduct = await product.save();
@@ -156,5 +149,31 @@ exports.editProduct = async (req, res, net) => {
         res.send({message: 'Product edited!', product: editedSavedProduct});
     } catch(error) {
         console.log(error);
+    }
+}
+
+exports.deleteProduct = async (req, res, next) => {
+    const prodId = req.params.productId;
+
+    try {
+        const savedProduct = await Product.findById(prodId);
+
+        console.log(savedProduct);
+
+        const imagePath = savedProduct.image;
+
+        fs.unlink(imagePath, (error) => {
+            if (error) {
+                throw error;
+            } else {
+                console.log('Image file deleted!');
+            }
+        })
+
+        await Product.delete(prodId);
+
+        res.send({message: 'Product deleted!'});
+    } catch(error) {
+        next(error);
     }
 }
