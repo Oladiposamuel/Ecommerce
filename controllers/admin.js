@@ -105,19 +105,28 @@ exports.editProduct = async (req, res, net) => {
     const updatedPrice = req.body.price;
     const updatedDescription = req.body.description;
     const updatedQuantity = req.body.quantity;
-    const updatedCategory = req.body.category;
+    const updatedBodyCategory = req.body.category;
     const userId = ObjectId(req.userId);
 
     let savedCategoryId;
 
     try {
-        const category = new Category(null, bodyCategory);
-        const savedCategory = await category.save();
-        const getCategory = await Category.findCategoryId(bodyCategory);
+        const category = new Category(null, updatedBodyCategory);
+        
+        const getCategory = await Category.findCategoryId(updatedBodyCategory);
         //console.log(getCategory);
-        const categoryId = getCategory._id;
-        //console.log(categoryId);
-        savedCategoryId = categoryId;
+
+        if (!getCategory) {
+            await category.save();
+            const getCategory = await Category.findCategoryId(updatedBodyCategory);
+            const categoryId = getCategory._id;
+            savedCategoryId = categoryId;
+        } else {
+            const categoryId = getCategory._id;
+            //console.log(categoryId);
+            savedCategoryId = categoryId;
+        }
+
     } catch(error) {
         console.log(error);
     }
@@ -126,17 +135,17 @@ exports.editProduct = async (req, res, net) => {
 
     try {
         const savedProduct = await Product.findById(prodId);
-        console.log(savedProduct);
+        //console.log(savedProduct);
         savedProduct.image = updatedImagePath;
         savedProduct.price = updatedPrice;
         savedProduct.title = updatedTitle;
         savedProduct.description = updatedDescription;
         savedProduct.quantity = updatedQuantity;
-        savedProduct.category = updatedCategory;
+        savedProduct.categoryId = savedCategoryId;
          
-        const product = new Product(updatedImagePath, updatedPrice, updatedTitle, updatedDescription, updatedQuantity, savedCategoryId, null, userId);
+        const product = new Product(updatedImagePath, updatedTitle, updatedPrice, updatedDescription, updatedQuantity, savedCategoryId, null, userId);
         const editedSavedProduct = await product.edit(prodId);
-        console.log(editedSavedProduct);
+        //console.log(editedSavedProduct);
 
         res.send({message: 'Product edited!', product: editedSavedProduct});
     } catch(error) {
