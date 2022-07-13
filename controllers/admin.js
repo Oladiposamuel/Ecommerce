@@ -39,7 +39,7 @@ exports.login = async (req, res, next) => {
         }
         //console.log(savedUser);
         bcrypt.compare(password, savedUser.password, function(err, res) {
-            console.log(res);
+            //console.log(res);
             if (!res) {
                 const error = new Error('Wrong password!')
                 error.statusCode = 401;
@@ -57,6 +57,24 @@ exports.login = async (req, res, next) => {
         
         res.json({message: 'Logged in!', token: token, user: savedUser._id});
         
+    } catch(error) {
+        next(error);
+    }
+}
+
+exports.getProducts = async (req, res, next) => {
+    const allProducts = await Product.getAllProducts();
+    res.send({message: 'All Products!', products: allProducts});
+}
+
+exports.getProductDetail = async (req, res, next) => {
+    const prodId = req.params.productId;
+    const id = ObjectId(prodId);
+
+    try { 
+        const productDetail = await Product.findById(id);
+
+        res.send({message: 'Product Detail!', productDetail: productDetail});
     } catch(error) {
         next(error);
     }
@@ -158,7 +176,7 @@ exports.deleteProduct = async (req, res, next) => {
     try {
         const savedProduct = await Product.findById(prodId);
 
-        console.log(savedProduct);
+        //console.log(savedProduct);
 
         const imagePath = savedProduct.image;
 

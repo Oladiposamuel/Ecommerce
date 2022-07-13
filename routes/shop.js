@@ -8,6 +8,8 @@ const isAuthUser = require('../middleware/is-AuthUser');
 
 router.get('/', shopController.getProducts);
 
+router.get('/product/product-detail/:productId', shopController.getProductDetail);
+
 router.post('/product/:productId', isAuthUser, shopController.addToCart);
 
 router.post('/product/prodinc/:productId', isAuthUser, shopController.increaseCartItem);

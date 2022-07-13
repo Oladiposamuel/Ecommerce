@@ -88,6 +88,18 @@ class Product {
             console.log(error);
         })
     }
+
+    static getAllProducts() {
+        const db = getDb();
+
+        return db.collection('products').find({}).toArray()
+        .then(result => {
+            return result;
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
 }
 
 module.exports = Product;

@@ -9,7 +9,22 @@ const{ getDb } = require('../util/database');
 const ObjectId = mongodb.ObjectId;
 
 exports.getProducts = async (req, res, next) => {
-    res.send('All Products!');
+    const allProducts = await Product.getAllProducts();
+
+    res.send({message: 'All Products!', products: allProducts});
+}
+
+exports.getProductDetail = async (req, res, next) => {
+    const prodId = req.params.productId;
+    const id = ObjectId(prodId);
+
+    try { 
+        const productDetail = await Product.findById(id);
+
+        res.send({message: 'Product Detail!', productDetail: productDetail});
+    } catch(error) {
+        next(error);
+    }
 }
 
 exports.addToCart = async (req, res, next) => {

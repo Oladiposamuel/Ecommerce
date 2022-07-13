@@ -10,6 +10,10 @@ router.put('/signup', adminController.signup);
 
 router.post('/login', adminController.login);
 
+router.get('/', adminController.getProducts);
+
+router.get('/product-detail/:productId', adminController.getProductDetail);
+
 router.post('/create-product', isAuthAdmin, adminController.createProduct);
 
 router.post('/edit-product/:productId', isAuthAdmin, adminController.editProduct);
