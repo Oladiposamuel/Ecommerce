@@ -56,6 +56,20 @@ class Product {
         })
     }
 
+    static findByCategoryId(id) {
+        const db = getDb();
+        const categoryId = ObjectId(id);
+
+        return db.collection('products').findOne({categoryId: categoryId})
+        .then(result => {
+            //console.log(result);
+            return result;
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
+
     edit(id) {
         const db = getDb();
         const prodId = ObjectId(id);

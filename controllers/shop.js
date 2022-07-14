@@ -113,3 +113,19 @@ exports.deleteCartItem = async (req, res, next) => {
     res.send({message: 'Item deleted!'});
 }
 
+exports.filterByCategory = async (req, res, next) => {
+    const categories = req.query.categories.split(",");
+    //console.log(categories);
+
+
+    const products = await Promise.all(categories.map( async (category) => {
+        const savedCategory = await Category.findCategoryId(category);
+        //console.log(savedCategory);
+        const id = savedCategory._id.toString();
+
+        const savedProduct = await Product.findByCategoryId(id);
+        return savedProduct;
+    }))
+
+    res.send({message: 'filtered!', productsByCategory: products });
+}

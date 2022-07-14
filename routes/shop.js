@@ -18,4 +18,6 @@ router.post('/product/proddec/:productId', isAuthUser, shopController.decreaseCa
 
 router.delete('/product/:productId', isAuthUser, shopController.deleteCartItem);
 
+router.get('/filterByCategory', shopController.filterByCategory);
+
 module.exports = router; 
