@@ -3,7 +3,15 @@ const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+const mailchimp = require("@mailchimp/mailchimp_marketing");
+
 exports.signup = async (req, res, next) => {
+
+    mailchimp.setConfig({
+        apiKey: "d455ce19e2b688ba8b12539bd86d9e95-us17",
+        server: "us17",
+    });
+
     const username = req.body.username;
     const email = req.body.email;
     const password = req.body.password;
@@ -11,6 +19,26 @@ exports.signup = async (req, res, next) => {
 
     var salt = bcrypt.genSaltSync(10);
     const hashPassword = bcrypt.hashSync(password, salt);
+    const listId = 'b33c56c530';
+
+    async function run() {
+        const response = await mailchimp.lists.addListMember(listId, {
+          email_address: email,
+          status: "subscribed",
+          merge_fields: {
+            FNAME: username,
+            //LNAME: username
+          }
+        });
+      
+        console.log(
+          `Successfully added contact as an audience member. The contact's id is ${
+            response.id
+          }.`
+        );
+    }
+      
+    run();
 
     try {
         const user = new User(username, email, hashPassword, isAdmin);
@@ -26,6 +54,7 @@ exports.login = async (req, res, next) => {
 
     const email = req.body.email;
     const password = req.body.password;
+
 
     try{
         const savedUser = await User.findUser(email);

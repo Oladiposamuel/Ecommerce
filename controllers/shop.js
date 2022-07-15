@@ -8,6 +8,7 @@ const{ getDb } = require('../util/database');
 
 const ObjectId = mongodb.ObjectId;
 
+
 exports.getProducts = async (req, res, next) => {
     const allProducts = await Product.getAllProducts();
 
