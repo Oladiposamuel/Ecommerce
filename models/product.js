@@ -114,6 +114,20 @@ class Product {
             console.log(error);
         })
     }
+
+    static update(prodId, newProductQty) {
+        const db = getDb();
+        return db.collection('products').updateOne({_id: prodId}, {$set: {quantity: newProductQty}})
+        .then(result => {
+            //console.log(result);
+            return result;
+        })
+        .catch(error => {
+            next(error);
+        })
+    }
 }
+
+
 
 module.exports = Product;

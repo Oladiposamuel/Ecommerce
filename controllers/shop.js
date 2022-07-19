@@ -114,6 +114,48 @@ exports.deleteCartItem = async (req, res, next) => {
     res.send({message: 'Item deleted!'});
 }
 
+exports.buyItem = async (req, res, next) => {
+    const prodId = ObjectId(req.params.productId);
+    const quantity = req.query.quantity;
+    const userId = ObjectId(req.userId);
+
+    let newWallet;
+    let newProductQty;
+
+    try {
+        const savedProduct = await Product.findById(prodId);
+        //console.log(savedProduct);
+        let productPrice = +savedProduct.price;
+        let productQty = +savedProduct.quantity;
+        
+        let totalAmount = productPrice * quantity;
+
+        const user = await User.findById(userId);
+        //console.log(user);
+        let userWallet = user.wallet;
+
+        if (userWallet < totalAmount) {
+            throw new Error('You can not afford it. Please fund your wallet!')
+        } else {
+            newWallet = userWallet - totalAmount;
+        }
+
+        if(productQty < quantity) {
+            throw new Error('Please reduce number of item!');
+        } else {
+            newProductQty = productQty - quantity;
+        }
+
+        const updatedProduct = await Product.update(prodId, newProductQty);
+
+        const updatedWallet = await User.update(userId, newWallet);
+
+        res.send({message: 'Bought!', updatedProduct: updatedProduct, updatedWallet: updatedWallet});
+    } catch (error) {
+        next(error);
+    }
+}
+
 exports.filterByCategory = async (req, res, next) => {
     const categories = req.query.categories.split(",");
     //console.log(categories);

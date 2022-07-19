@@ -4,10 +4,11 @@ const {getDb} = require('../util/database');
 const ObjectId = mongodb.ObjectId;
 
 class User {
-    constructor(username, email, password, isAdmin) {
+    constructor(username, email, password, isAdmin, wallet) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.wallet = wallet;
         this.isAdmin = isAdmin;
     }
 
@@ -37,6 +38,18 @@ class User {
         .catch(error => {
             next(error);
         });
+    }
+
+    static update(userId, walletAmount) {
+        const db = getDb();
+        return db.collection('users').updateOne({_id: userId}, {$set: {wallet: walletAmount}})
+        .then(result => {
+            //console.log(result);
+            return result;
+        })
+        .catch(error => {
+            next(error);
+        })
     }
 }
 
