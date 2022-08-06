@@ -4,17 +4,24 @@ const {getDb} = require('../util/database');
 const ObjectId = mongodb.ObjectId;
 
 class User {
-    constructor(username, email, password, isAdmin, wallet) {
+    constructor(username, email, password, isAdmin, verified, wallet) {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.wallet = wallet;
         this.isAdmin = isAdmin;
+        this.verified = verified;
+        this.wallet = wallet;
     }
 
     save() {
         const db = getDb();
-        return db.collection('users').insertOne(this);
+        return db.collection('users').insertOne(this)
+        .then(user => {
+            return user;
+        })
+        .catch(error => {
+            next(error);
+        })
     }
 
     static findUser(email) {
@@ -40,9 +47,9 @@ class User {
         });
     }
 
-    static update(userId, walletAmount) {
+    static update(userId) {
         const db = getDb();
-        return db.collection('users').updateOne({_id: userId}, {$set: {wallet: walletAmount}})
+        return db.collection('users').updateOne({_id: userId}, {$set: {verified: true}})
         .then(result => {
             //console.log(result);
             return result;

@@ -18,7 +18,7 @@ router.post('/product/proddec/:productId', isAuthUser, shopController.decreaseCa
 
 router.delete('/product/:productId', isAuthUser, shopController.deleteCartItem);
 
-router.post('/product/buy/:productId', isAuthUser, shopController.buyItem);
+router.post('/product/buy/:productId', shopController.buyItem);
 
 router.get('/filterByCategory', shopController.filterByCategory);
 

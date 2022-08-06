@@ -1,4 +1,6 @@
+const https = require('https');
 const mongodb = require('mongodb');
+const axios = require('axios');
 const Product = require('../models/product');
 const User = require('../models/user');
 const Category = require('../models/category');
@@ -117,9 +119,9 @@ exports.deleteCartItem = async (req, res, next) => {
 exports.buyItem = async (req, res, next) => {
     const prodId = ObjectId(req.params.productId);
     const quantity = req.query.quantity;
-    const userId = ObjectId(req.userId);
+    const email = req.body.email;
+    //const amount = req.body.amount;
 
-    let newWallet;
     let newProductQty;
 
     try {
@@ -128,32 +130,68 @@ exports.buyItem = async (req, res, next) => {
         let productPrice = +savedProduct.price;
         let productQty = +savedProduct.quantity;
         
-        let totalAmount = productPrice * quantity;
-
-        const user = await User.findById(userId);
-        //console.log(user);
-        let userWallet = user.wallet;
-
-        if (userWallet < totalAmount) {
-            throw new Error('You can not afford it. Please fund your wallet!')
-        } else {
-            newWallet = userWallet - totalAmount;
-        }
+        let totalAmount = productPrice * quantity * 100;
 
         if(productQty < quantity) {
             throw new Error('Please reduce number of item!');
         } else {
             newProductQty = productQty - quantity;
-        }
+            //console.log(newProductQty);
+        } 
 
         const updatedProduct = await Product.update(prodId, newProductQty);
 
-        const updatedWallet = await User.update(userId, newWallet);
+        const params = JSON.stringify({
+            "email": email,
+            "amount": +totalAmount
+        })
 
-        res.send({message: 'Bought!', updatedProduct: updatedProduct, updatedWallet: updatedWallet});
+        const options = {
+            hostname: 'api.paystack.co',
+            port: 443,
+            path: '/transaction/initialize',
+            method: 'POST',
+            headers: {
+              Authorization: 'Bearer sk_test_b579d50e0976f15d6d022c33f3f87573117be2ee',
+              'Content-Type': 'application/json',
+              'Cache-Control': 'no-cache'
+            }
+        }
+
+
+        const req = https.request(options, res => {
+        let data = ''
+        let resData;
+        
+        res.on('data', (chunk) => {
+            data += chunk
+        });
+        
+        res.on('end', (res) => {
+            resData = JSON.parse(data);
+            //console.log(resData);
+            //url = resData.data.authorization_url;
+            processData(resData);
+        })
+
+
+        }).on('error', error => {
+        console.error(error)
+        })
+        
+        req.write(params)
+        req.end()
+
+        
+        const processData = (resData) => {
+            res.json({message: 'Message!', data: resData});
+        }
+
     } catch (error) {
+        console.log(error);
         next(error);
     }
+
 }
 
 exports.filterByCategory = async (req, res, next) => {
